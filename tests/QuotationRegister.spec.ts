@@ -68,5 +68,7 @@ for (const row of records) {
       phone: row.phone,
       email: row.email
     });
+
+    await page.screenshot({ path: 'screenshot.png', fullPage: true });
   });
 }
