@@ -11,7 +11,7 @@ def run_automation():
         
         with sync_playwright() as p:
             # เปิดเบราว์เซอร์แบบไม่มีหน้าจอ (Headless) ซึ่งจำเป็นมากบน Cloud
-            browser = p.chromium.launch(headless=True)
+            browser = p.chromium.launch(headless=True, channel="chromium")
             context = browser.new_context(viewport={"width": 1920, "height": 3000})
             page = context.new_page()
             
