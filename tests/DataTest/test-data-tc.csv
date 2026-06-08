@@ -1,0 +1,3 @@
+﻿scenario,registerNo,companyName,registrationType,businessType,province,title,firstName,lastName,position,email,phone
+ชุดที่ 1,1234567890133,AAA,องค์กร,การผลิต,กระบี่,นาย,MMM,LLL,Boss,Mateetesting39@gmail.com,0841052508
+ชุดที่ 2,1234567890122,BBB,สมาคม,การก่อสร้าง,ตรัง,นาง,NNN,OOO,Big,Mateesukaim@gmail.com,0841052508
