@@ -21,7 +21,7 @@ if st.button("🚀 เริ่มทำการทดสอบระบบ"):
             except: pass
             
         # บังคับติดตั้งเบราว์เซอร์ของฝั่ง Python (วิธีนี้ผ่านฉลุยบน Streamlit Cloud แน่นอน)
-        subprocess.run(["playwright", "install", "chromium"], capture_output=True)
+        subprocess.run(["playwright", "install", "chromium", "--with-deps"], capture_output=True)
             
         # 2. เรียกฟังก์ชันรันบอทเทสอัตโนมัติแบบ Native
         try:
