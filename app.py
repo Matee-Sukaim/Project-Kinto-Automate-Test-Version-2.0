@@ -58,18 +58,43 @@ if st.button("🚀 เริ่มทำการทดสอบระบบ", t
         except Exception as e:
             st.error(f"❌ เกิดข้อผิดพลาดขณะบอทรันระบบ: {str(e)}")
 
-    image_files = sorted(glob.glob("screenshot_*.png"))
+    st.markdown("---")
+    
+    # ดึงพิกัดปัจจุบันให้ชัวร์ ป้องกันปัญหาตำแหน่งไฟล์บนเซิร์ฟเวอร์จำลอง คลาดเคลื่อน
+    current_dir = os.getcwd()
+    image_files = sorted(glob.glob(os.path.join(current_dir, "screenshot_*.png")))
+    
     if image_files:
-        st.subheader("📸 รูปภาพผลลัพธ์การทดสอบของทุกลูป:")
+        st.subheader("📸 รูปภาพผลลัพธ์การทดสอบในแต่ละ Scenario:")
+        st.info(f"💡 พบรูปภาพหลักฐานทั้งหมด {len(image_files)} รูป")
+        
         for img_path in image_files:
+            # ดึงเฉพาะชื่อไฟล์ออกมาตัดแต่ง (เช่น /mount/src/.../screenshot_Test_1.png -> Test 1)
+            file_name = os.path.basename(img_path)
             scenario_name = (
-                img_path
+                file_name
                 .replace("screenshot_", "")
                 .replace(".png", "")
                 .replace("_", " ")
             )
-            st.write(f"🔹 **ผลการทดสอบรอบ:** {scenario_name}")
-            st.image(img_path, use_container_width=True)
-            st.markdown("---")
+            
+            # ใช้ st.expander ม้วนเก็บรูปไว้ เพื่อให้หน้าเว็บสแกนตรวจงานง่าย ไม่ยาวเป็นหางว่าว
+            with st.expander(f"🔍 ดูภาพหลักฐานรอบ: {scenario_name}", expanded=True):
+                st.image(img_path, caption=f"ภาพหน้าจอของ Scenario: {scenario_name}", use_container_width=True)
+                
+                # เพิ่มปุ่มดาวน์โหลดรูปภาพเผื่อพี่ต้องส่งให้ทีมดู
+                with open(img_path, "rb") as file:
+                    st.download_button(
+                        label=f"📥 ดาวน์โหลดรูปภาพ ({scenario_name})",
+                        data=file,
+                        file_name=file_name,
+                        mime="image/png",
+                        key=file_name # ป้องกันปุ่มตีกันบน Streamlit
+                    )
     else:
-        st.info("ℹ️ ไม่พบรูปภาพผลลัพธ์ — อาจเกิด error ก่อนแคปหน้าจอได้")
+        st.warning("⚠️ ไม่พบรูปภาพผลลัพธ์การทดสอบในโฟลเดอร์ระบบ")
+        st.info(
+            "💡 คำแนะนำในการตรวจสอบ:\n"
+            "1. ตรวจสอบใน `test_script.py` ว่าเขียนตำแหน่งเซฟภาพด้วย `os.path.join(os.getcwd(), f'screenshot_{scenario}.png')` ชี้มาที่เดียวกันหรือไม่\n"
+            "2. หาก Scenario ไหนติด Error ลองเช็กดูว่าบอทสามารถรันคำสั่ง `page.screenshot` ได้ทันก่อนที่เบราว์เซอร์จะหลุดปิดตัวหรือไม่"
+        )
