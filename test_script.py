@@ -26,8 +26,17 @@ def run_automation():
                 page.wait_for_load_state("networkidle") # รอหน้าแรกโหลดนิ่ง ๆ 
 
                 # ✍️ 2. กรอกข้อมูลตามตาราง CSV (ผมเปิดคอมเมนต์ให้รันจริงแล้วครับ)
-                page.fill("input[name='registerNo']", row['registerNo'])
-                page.fill("input[name='companyName']", row['companyName'])
+                page.fill("#RegisterNo_Input", row['registerNo'])
+                page.fill("#CompanyName_Input", row['companyName'])
+                page.fill("#Phone_Input", row['phone'])
+                page.fill("#Email_Input", row['email'])
+                page.fill("#FirstName_Input", row['firstName'])
+                page.fill("#LastName_Input", row['lastName'])
+                page.selectOption("#Input_RegistrationType", label=row['registrationType'])
+                page.selectOption("#BusinessType_Input", label=row['businessType'])
+                page.selectOption("#CustomerTitle_Input", label=row['title'])
+                page.selectOption("#Province_Input", label=row['province'])
+                page.fill("#Position_Input", row['position'])
 
                 # -------------------------------------------------------------------------
                 # 🛑 [พี่ต้องปรับจุดนี้ให้ตรงกับหน้างานจริง] ท่อนพาบอทเดินไปหน้าสุดท้าย
@@ -36,14 +45,15 @@ def run_automation():
                 # พี่ต้องเปลี่ยนคำว่า "button.btn-next" หรือ "text=ถัดไป" ให้ตรงกับ Selector ปุ่มบนเว็บจริงของพี่ครับ
                 
                 # ตัวอย่างท่าที่ 1: สั่งคลิกโดยหาจากข้อความบนปุ่มตรง ๆ
-                page.click("text=ถัดไป") 
-                
+                page.click("text=ดำเนินการต่อ") 
+                page.check("#Consent_Checkbox") # ถ้ามีเช็คบ็อกซ์ให้ติ๊กก่อนกดถัดไปก็ให้เพิ่มบรรทัดนี้เข้าไปด้วยครับ    
+                page.click("text=ยืนยัน") # ถ้ามีปุ่มคำนวณให้กดอีกทีหลังจากติ๊กเช็คบ็อกซ์แล้วก็เพิ่มบรรทัดนี้เข้าไปด้วยครับ
                 # ตัวอย่างท่าที่ 2: สั่งคลิกปุ่มบันทึกหรือส่งข้อมูลหน้าถัดไปเพื่อให้ไปหน้าสุดท้าย
                 # page.click("button#CalculateButton")
                 
                 # ⏳ 3. บังคับให้บอท "หยุดรอ" จนกว่าตัวเลขผลลัพธ์หรือหน้าสุดท้ายจะโหลดข้อมูลเสร็จ 100%
                 page.wait_for_load_state("networkidle")
-                time.sleep(5) # แรปแถมเพิ่มให้อีก 3 วินาทีเพื่อให้มั่นใจว่าหน้าจอไม่ขาว/ไม่โหลดค้าง
+                time.sleep(5) # แรปแถมเพิ่มให้อีก 5 วินาทีเพื่อให้มั่นใจว่าหน้าจอไม่ขาว/ไม่โหลดค้าง
                 # -------------------------------------------------------------------------
 
                 # 📸 4. บรรทัดนี้แหละครับ! เมื่อบอทมันรอจนหน้านิ่งที่ "หน้าสุดท้าย" แล้ว 
