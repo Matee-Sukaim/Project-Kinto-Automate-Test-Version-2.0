@@ -1,10 +1,10 @@
 import csv
 import os
+import time
 from playwright.sync_api import sync_playwright
 
 def run_automation():
-    # 📌 เช็กจุดนี้: ปัจจุบันระบบจะหาไฟล์จากโฟลเดอร์ tests/DataTest/test-data-tc.csv
-    # ถ้าพี่วางไฟล์ไว้ข้างนอกสุด ให้แก้บรรทัดนี้เป็น: csv_file_path = os.path.join(os.getcwd(), 'test-data-tc.csv')
+    # ชี้ไปที่โฟลเดอร์เก็บไฟล์ CSV ของพี่
     csv_file_path = os.path.join(os.getcwd(), 'tests', 'DataTest', 'test-data-tc.csv')
     
     with open(csv_file_path, mode='r', encoding='utf-8-sig') as file:
@@ -14,7 +14,6 @@ def run_automation():
     results = []
 
     with sync_playwright() as p:
-        # เปิดเบราว์เซอร์ Chromium โดยอิงตามโฟลเดอร์ที่เราเซ็ตไว้ใน app.py
         browser = p.chromium.launch(headless=True)
 
         for row in rows:
@@ -22,14 +21,33 @@ def run_automation():
             page = context.new_page()
 
             try:
-                # 🚀 บรรทัดนี้: เปลี่ยนเป็น URL หน้าเว็บที่ต้องการทดสอบจริง ๆ ครับพี่ (ตอนนี้ใส่ตัวอย่างเว็บจำลองไว้)
-                page.goto("https://www.google.com", timeout=30000)
+                # 🌐 1. เปิดเข้าหน้า Quotation Form ของ KintoONE ตามที่พี่ระบุมา
+                page.goto("https://tlcl-dev.outsystemsenterprise.com/KintoONE/QuotationForm?PackageCustomerSelectedId=5239&ProductCategoryId=5", timeout=30000)
+                page.wait_for_load_state("networkidle") # รอหน้าแรกโหลดนิ่ง ๆ 
 
-                # บรรทัดกรอกข้อมูล (เปิดคอมเมนต์เพื่อใช้งาน Selector จริงของพี่ได้เลย)
-                # page.fill("input[name='registerNo']", row['registerNo'])
-                # page.fill("input[name='companyName']", row['companyName'])
+                # ✍️ 2. กรอกข้อมูลตามตาราง CSV (ผมเปิดคอมเมนต์ให้รันจริงแล้วครับ)
+                page.fill("input[name='registerNo']", row['registerNo'])
+                page.fill("input[name='companyName']", row['companyName'])
 
-                # 📸 บังคับเซฟรูปไว้ที่โฟลเดอร์หลักเพื่อให้ app.py ดึงไปโชว์หน้าบ้านได้ถูกตำแหน่ง
+                # -------------------------------------------------------------------------
+                # 🛑 [พี่ต้องปรับจุดนี้ให้ตรงกับหน้างานจริง] ท่อนพาบอทเดินไปหน้าสุดท้าย
+                # -------------------------------------------------------------------------
+                # เนื่องจากหน้าสุดท้ายของ OutSystems มักจะต้องมีการกดปุ่ม "ถัดไป" หรือ "คำนวณ" หรือ "บันทึก"
+                # พี่ต้องเปลี่ยนคำว่า "button.btn-next" หรือ "text=ถัดไป" ให้ตรงกับ Selector ปุ่มบนเว็บจริงของพี่ครับ
+                
+                # ตัวอย่างท่าที่ 1: สั่งคลิกโดยหาจากข้อความบนปุ่มตรง ๆ
+                page.click("text=ถัดไป") 
+                
+                # ตัวอย่างท่าที่ 2: สั่งคลิกปุ่มบันทึกหรือส่งข้อมูลหน้าถัดไปเพื่อให้ไปหน้าสุดท้าย
+                # page.click("button#CalculateButton")
+                
+                # ⏳ 3. บังคับให้บอท "หยุดรอ" จนกว่าตัวเลขผลลัพธ์หรือหน้าสุดท้ายจะโหลดข้อมูลเสร็จ 100%
+                page.wait_for_load_state("networkidle")
+                time.sleep(3) # แรปแถมเพิ่มให้อีก 3 วินาทีเพื่อให้มั่นใจว่าหน้าจอไม่ขาว/ไม่โหลดค้าง
+                # -------------------------------------------------------------------------
+
+                # 📸 4. บรรทัดนี้แหละครับ! เมื่อบอทมันรอจนหน้านิ่งที่ "หน้าสุดท้าย" แล้ว 
+                # สั่งแคปภาพหน้าเว็บเต็ม ๆ เซฟไฟล์ส่งกลับไปให้ app.py ดึงไปวางโชว์หน้าบ้านทันที
                 scenario_clean = row['scenario'].replace(" ", "_")
                 save_path = os.path.join(os.getcwd(), f"screenshot_{scenario_clean}.png")
                 page.screenshot(path=save_path, full_page=True)
@@ -37,7 +55,7 @@ def run_automation():
                 results.append({"scenario": row['scenario'], "status": "✅ สำเร็จ"})
 
             except Exception as e:
-                # กรณี Error ก็แคปหน้าจอเก็บไว้เป็นหลักฐานด้วย
+                # ถ้าลูปไหนระเบิดค้างกลางทาง ก็ให้แคปหน้าปัจจุบัน ณ ตอนที่พังเก็บไว้เป็นหลักฐานด้วย
                 scenario_clean = row.get('scenario', 'unknown').replace(" ", "_")
                 error_path = os.path.join(os.getcwd(), f"screenshot_{scenario_clean}.png")
                 try:
