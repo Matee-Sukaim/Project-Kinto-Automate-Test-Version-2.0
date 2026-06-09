@@ -10,11 +10,12 @@ def run_automation():
         reader = csv.DictReader(file)
         
         with sync_playwright() as p:
-            # 🚀 [แก้ไขจุดนี้] ถอด executable_path ออกทั้งหมด ปล่อยให้ระบบออโต้หาเอง
-            # และเปิด headless=True เพื่อให้รันหลังบ้านบน Cloud ได้อย่างราบรื่น
+            # ปล่อยให้มันหาจากพิกัด PLAYWRIGHT_BROWSERS_PATH ที่เราตั้งไว้ใน app.py อัตโนมัติ
             browser = p.chromium.launch(headless=True)
             context = browser.new_context(viewport={"width": 1920, "height": 3000})
             page = context.new_page()
+            
+            # ... โค้ดวนลูป CSV ด้านล่างปล่อยไว้ตามปกติเลยครับ ...
             
             # วนลูปเทสตามตารางข้อมูล CSV ทุกลูป
             for row in reader:
