@@ -20,7 +20,7 @@ def run_automation():
 
             try:
                 # ✅ เปลี่ยน URL ตรงนี้เป็น URL จริง
-                page.goto("https://YOUR-REAL-URL.com", timeout=30000)
+                page.goto("https://project-kinto-automate-test-version-20-v6nap4jkrtvx6mwhmyru56.streamlit.app", timeout=30000)
 
                 # กรอกข้อมูล
                 page.fill("input[name='registerNo']", row['registerNo'])
