@@ -10,8 +10,9 @@ def run_automation():
         reader = csv.DictReader(file)
         
         with sync_playwright() as p:
-            # เปิดเบราว์เซอร์แบบไม่มีหน้าจอ (Headless) ซึ่งจำเป็นมากบน Cloud
-            browser = p.chromium.launch(headless=True, channel="chromium")
+            # 🚀 [แก้ไขจุดนี้] ถอด executable_path ออกทั้งหมด ปล่อยให้ระบบออโต้หาเอง
+            # และเปิด headless=True เพื่อให้รันหลังบ้านบน Cloud ได้อย่างราบรื่น
+            browser = p.chromium.launch(headless=True)
             context = browser.new_context(viewport={"width": 1920, "height": 3000})
             page = context.new_page()
             
